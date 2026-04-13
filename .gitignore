@@ -11,3 +11,5 @@ frontend/dist/
 .mvn/
 mvnw
 mvnw.cmd
+.DS_Store
+*.iml
