@@ -1,14 +1,13 @@
 # Project exclude paths
 /target/
 .env
-.idea
+.env.example
+/.idea
 target/
 node_modules/
 frontend/node_modules/
 frontend/dist/
 .git/
-Dockerfile
-docker-compose.yml
 .mvn/
 mvnw
 mvnw.cmd
