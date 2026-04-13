@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Activities List</title>
+    <!-- Link to Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+    <!-- Add any additional styling or custom CSS files here -->
+    <style>
+        body {
+            background-color: #fff;
+            padding: 20px;
+        }
+    </style>
+</head>
+<body>
+<header th:insert="blocks/headerUser:: headerUser"></header>
+<a class="me-3 py-2 text-dark text-decoration-none" href="/indexUser">Back</a>
+
+<div class="container">
+    <div th:if="${errorMessage}" class="alert alert-danger" th:text="${errorMessage}"></div>
+    <h2>User Evidence Records List</h2>
+    <a class="btn btn-secondary" th:href="'/evidence/download/all'" >Export all</a>
+    <br>
+    <table class="table table-bordered">
+        <thead class="thead-dark">
+        <tr>
+            <th>Project id</th>
+            <th>Task name</th>
+            <th>Project name</th>
+            <th>Order num</th>
+            <th>Department</th>
+            <th>Estimated time</th>
+            <th>Spent time</th>
+            <th>Charge</th>
+            <th>Total</th>
+            <th>State</th>
+            <th>Month</th>
+            <th>Details</th>
+            <th>Actions</th>
+            <!-- Add more columns as needed -->
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="evidence: ${evidences}">
+        <td th:text="${evidence.id}"></td>
+            <td th:text="${evidence.taskName}"></td>
+            <td th:text="${evidence.project}"></td>
+            <td th:text="${evidence.orderNum}"></td>
+            <td th:text="${evidence.department}"></td>
+            <td th:text="${evidence.estTime}"></td>
+            <td th:text="${evidence.timeSpent}"></td>
+            <td th:text="${evidence.charge}"></td>
+            <td th:text="${evidence.total}"></td>
+            <td th:text="${evidence.state}"></td>
+            <td th:text="${evidence.month}"></td>
+
+
+            <td class="text-center"><a class="btn btn-primary" th:href="'/evidences/'+${evidence.id}">More</a></td>
+            <td class="text-center">
+                <form th:action="'/evidences/'+${evidence.id}+'/delete'" method="post" style="display:inline;">
+                    <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure you want to delete this record?');">Delete</button>
+                </form>
+                <a class="btn btn-warning btn-sm" th:href="'/evidences/'+${evidence.id}+'/edit'">Edit</a>
+                <a class="btn btn-info btn-sm" th:href="'/evidence/download/'+${evidence.id}">Export</a>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+    <a class="btn btn-success" th:href="'/evidences/create'">Create Record</a>
+</div>
+
+<footer th:insert="blocks/footer :: footer"></footer>
+
+<!-- Link to Bootstrap JS and Popper.js (if needed) -->
+<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+</body>
+</html>
