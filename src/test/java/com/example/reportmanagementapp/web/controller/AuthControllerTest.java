@@ -1,11 +1,9 @@
 package com.example.reportmanagementapp.web.controller;
 
-import com.example.reportmanagementapp.application.dto.AuthResponse;
 import com.example.reportmanagementapp.application.dto.LoginRequest;
 import com.example.reportmanagementapp.application.dto.UserDto;
 import com.example.reportmanagementapp.application.user.commands.RegisterUserCommandHandler;
 import com.example.reportmanagementapp.application.user.queries.FindUserByEmailQueryHandler;
-import com.example.reportmanagementapp.domain.entity.User;
 import com.example.reportmanagementapp.infrastructure.security.JwtService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
