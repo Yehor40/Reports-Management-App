@@ -8,11 +8,11 @@ import com.example.reportmanagementapp.infrastructure.security.AccessControlServ
 import com.example.reportmanagementapp.infrastructure.security.JwtService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 
 import java.util.ArrayList;
 
@@ -24,7 +24,6 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(ExcelController.class)
-@AutoConfigureMockMvc(addFilters = false)
 class ExcelControllerTest {
 
     @Autowired
@@ -61,7 +60,7 @@ class ExcelControllerTest {
     }
 
     @Test
-    @WithMockUser
+    @WithMockUser(roles = "ADMIN")
     void downloadAllEvidences_ShouldSucceed() throws Exception {
         when(listAllEvidencesQueryHandler.handle()).thenReturn(new ArrayList<>());
 
@@ -77,7 +76,7 @@ class ExcelControllerTest {
         when(getUserIdByUsernameQueryHandler.handle("user@example.com")).thenReturn(1L);
         when(listUserEvidencesQueryHandler.handle(1L)).thenReturn(new ArrayList<>());
 
-        mockMvc.perform(get("/api/excel/download/my"))
+        mockMvc.perform(get("/api/excel/download/my").with(user("user@example.com").roles("USER")))
                 .andExpect(status().isOk());
 
         verify(reportExporter).exportList(any(), any());

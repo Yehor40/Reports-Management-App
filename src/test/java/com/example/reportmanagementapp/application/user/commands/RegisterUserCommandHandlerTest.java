@@ -2,7 +2,6 @@ package com.example.reportmanagementapp.application.user.commands;
 
 import com.example.reportmanagementapp.application.dto.UserDto;
 import com.example.reportmanagementapp.domain.entity.Role;
-import com.example.reportmanagementapp.domain.entity.User;
 import com.example.reportmanagementapp.domain.repository.RoleRepository;
 import com.example.reportmanagementapp.domain.repository.UserRepository;
 import org.junit.jupiter.api.Test;
@@ -12,7 +11,6 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -31,17 +29,17 @@ class RegisterUserCommandHandlerTest {
     private RegisterUserCommandHandler handler;
 
     @Test
-    void handle_ShouldEncodePasswordAndSaveUserWithAdminRole() {
+    void handle_ShouldEncodePasswordAndSaveUserWithUserRole() {
         UserDto dto = new UserDto();
         dto.setName("Admin User");
         dto.setEmail("admin@example.com");
         dto.setPassword("pass123");
 
-        Role adminRole = new Role();
-        adminRole.setName("ROLE_ADMIN");
+        Role userRole = new Role();
+        userRole.setName("ROLE_USER");
 
         when(passwordEncoder.encode("pass123")).thenReturn("encoded_pass");
-        when(roleRepository.findByName("ROLE_ADMIN")).thenReturn(adminRole);
+        when(roleRepository.findByName("ROLE_USER")).thenReturn(userRole);
 
         handler.handle(dto);
 
@@ -49,7 +47,7 @@ class RegisterUserCommandHandlerTest {
         verify(userRepository).save(argThat(user -> 
             user.getName().equals("Admin User") &&
             user.getPassword().equals("encoded_pass") &&
-            user.getRoles().get(0).getName().equals("ROLE_ADMIN")
+            user.getRoles().get(0).getName().equals("ROLE_USER")
         ));
     }
 }
