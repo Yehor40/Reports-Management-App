@@ -46,7 +46,12 @@ public class SpringSecurity {
             .cors(withDefaults())
             .csrf(AbstractHttpConfigurer::disable)
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/api/auth/**").permitAll()
+                .requestMatchers(
+                        "/api/auth/**",
+                        "/v1/api-docs/**",
+                        "/swagger-ui/**",
+                        "/swagger-ui.html"
+                ).permitAll()
                 .requestMatchers("/api/excel/download/**").authenticated()
                 .requestMatchers("/api/evidences/**").authenticated()
                 .requestMatchers("/api/users/**").hasRole("ADMIN")
