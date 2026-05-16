@@ -13,6 +13,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 
 import java.util.ArrayList;
 
@@ -21,6 +22,7 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(ExcelController.class)
@@ -40,6 +42,9 @@ class ExcelControllerTest {
 
     @MockBean
     private GetUserIdByUsernameQueryHandler getUserIdByUsernameQueryHandler;
+
+    @MockBean
+    private com.example.reportmanagementapp.application.evidence.queries.GetEvidenceByIdQueryHandler getEvidenceByIdQueryHandler;
 
     @MockBean(name = "accessControl")
     private AccessControlService accessControlService;
@@ -71,12 +76,40 @@ class ExcelControllerTest {
     }
 
     @Test
-    @WithMockUser(username = "user@example.com")
+    @WithMockUser(username = "admin@example.com")
     void downloadMyEvidences_ShouldSucceed() throws Exception {
-        when(getUserIdByUsernameQueryHandler.handle("user@example.com")).thenReturn(1L);
+        when(getUserIdByUsernameQueryHandler.handle("admin@example.com")).thenReturn(1L);
         when(listUserEvidencesQueryHandler.handle(1L)).thenReturn(new ArrayList<>());
 
-        mockMvc.perform(get("/api/excel/download/my").with(user("user@example.com").roles("USER")))
+        mockMvc.perform(get("/api/excel/download/my").with(user("admin@example.com").roles("ADMIN")))
+                .andExpect(status().isOk());
+
+        verify(reportExporter).exportList(any(), any());
+    }
+
+    @Test
+    @WithMockUser(username = "admin@example.com", roles = "ADMIN")
+    void downloadMyEvidences_AsAdmin_ShouldSucceed() throws Exception {
+        when(getUserIdByUsernameQueryHandler.handle("admin@example.com")).thenReturn(1L);
+        when(listUserEvidencesQueryHandler.handle(1L)).thenReturn(new ArrayList<>());
+
+        mockMvc.perform(get("/api/excel/download/my"))
+                .andExpect(status().isOk());
+
+        verify(reportExporter).exportList(any(), any());
+    }
+    @Test
+    @WithMockUser(username = "user@example.com")
+    void downloadSelectedEvidences_ShouldSucceed() throws Exception {
+        java.util.List<Long> ids = java.util.List.of(1L, 2L);
+        when(accessControlService.canAccessEvidence("user@example.com", 1L)).thenReturn(true);
+        when(accessControlService.canAccessEvidence("user@example.com", 2L)).thenReturn(true);
+        
+        mockMvc.perform(post("/api/excel/download/selected")
+                        .contentType("application/json")
+                        .content("[1, 2]")
+                        .with(user("user@example.com").roles("USER"))
+                        .with(csrf()))
                 .andExpect(status().isOk());
 
         verify(reportExporter).exportList(any(), any());

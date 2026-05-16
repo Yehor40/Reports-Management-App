@@ -41,18 +41,18 @@ public class ExcelEvidenceExporter implements ReportExporter {
     }
     
     public void exportList(List<EvidenceDto> evidenceList, OutputStream outputStream) throws IOException {
-        if (evidenceList != null && !evidenceList.isEmpty()) {
-            try (Workbook workbook = new XSSFWorkbook()) {
-                Sheet sheet = workbook.createSheet("Reports");
-                createHeaderRow(sheet);
+        try (Workbook workbook = new XSSFWorkbook()) {
+            Sheet sheet = workbook.createSheet("Reports");
+            createHeaderRow(sheet);
 
+            if (evidenceList != null) {
                 int rowNum = 1;
                 for (EvidenceDto evidence : evidenceList) {
                     Row row = sheet.createRow(rowNum++);
                     fillEvidenceRow(row, evidence);
                 }
-                workbook.write(outputStream);
             }
+            workbook.write(outputStream);
         }
     }
 
@@ -66,16 +66,16 @@ public class ExcelEvidenceExporter implements ReportExporter {
     }
 
     private void fillEvidenceRow(Row row, EvidenceDto evidence) {
-        row.createCell(0).setCellValue(evidence.getId());
-        row.createCell(1).setCellValue(evidence.getTaskName());
-        row.createCell(2).setCellValue(evidence.getProject());
-        row.createCell(3).setCellValue(evidence.getOrderNum());
-        row.createCell(4).setCellValue(evidence.getDepartment());
+        row.createCell(0).setCellValue(evidence.getId() != null ? evidence.getId() : 0L);
+        row.createCell(1).setCellValue(evidence.getTaskName() != null ? evidence.getTaskName() : "");
+        row.createCell(2).setCellValue(evidence.getProject() != null ? evidence.getProject() : "");
+        row.createCell(3).setCellValue(evidence.getOrderNum() != null ? evidence.getOrderNum() : "");
+        row.createCell(4).setCellValue(evidence.getDepartment() != null ? evidence.getDepartment() : "");
         row.createCell(5).setCellValue(evidence.getEstTime());
         row.createCell(6).setCellValue(evidence.getTimeSpent());
         row.createCell(7).setCellValue(evidence.getCharge());
         row.createCell(8).setCellValue(evidence.getTotal());
-        row.createCell(9).setCellValue(evidence.getState());
-        row.createCell(10).setCellValue(evidence.getMonth());
+        row.createCell(9).setCellValue(evidence.getState() != null ? evidence.getState() : "");
+        row.createCell(10).setCellValue(evidence.getMonth() != null ? evidence.getMonth() : "");
     }
 }
