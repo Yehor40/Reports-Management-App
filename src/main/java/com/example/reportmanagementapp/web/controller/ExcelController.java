@@ -1,18 +1,17 @@
 package com.example.reportmanagementapp.web.controller;
 
 import com.example.reportmanagementapp.application.dto.EvidenceDto;
+import com.example.reportmanagementapp.application.evidence.queries.GetEvidenceByIdQueryHandler;
 import com.example.reportmanagementapp.application.evidence.queries.ListAllEvidencesQueryHandler;
 import com.example.reportmanagementapp.application.evidence.queries.ListUserEvidencesQueryHandler;
 import com.example.reportmanagementapp.application.user.queries.GetUserIdByUsernameQueryHandler;
 import com.example.reportmanagementapp.infrastructure.reports.ExcelEvidenceExporter;
+import com.example.reportmanagementapp.infrastructure.security.AccessControlService;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
 import java.security.Principal;
@@ -27,6 +26,8 @@ public class ExcelController {
     private final ListAllEvidencesQueryHandler listAllEvidencesQueryHandler;
     private final ListUserEvidencesQueryHandler listUserEvidencesQueryHandler;
     private final GetUserIdByUsernameQueryHandler getUserIdByUsernameQueryHandler;
+    private final GetEvidenceByIdQueryHandler getEvidenceByIdQueryHandler;
+    private final AccessControlService accessControlService;
 
     @GetMapping("/download/{id}")
     @PreAuthorize("@accessControl.canAccessEvidence(authentication.name, #id)")
@@ -48,7 +49,7 @@ public class ExcelController {
     }
 
     @GetMapping("/download/my")
-    @PreAuthorize("hasRole('USER')")
+    @PreAuthorize("hasAnyRole('USER', 'ADMIN')")
     public void downloadMyEvidencesExcel(HttpServletResponse response, Principal principal) throws IOException {
         response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
         response.setHeader(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"my_evidences.xlsx\"");
@@ -56,5 +57,21 @@ public class ExcelController {
         Long userId = getUserIdByUsernameQueryHandler.handle(principal.getName());
         List<EvidenceDto> myEvidence = listUserEvidencesQueryHandler.handle(userId);
         reportExporter.exportList(myEvidence, response.getOutputStream());
+    }
+
+    @PostMapping("/download/selected")
+    @PreAuthorize("isAuthenticated()")
+    public void downloadSelectedEvidencesExcel(@RequestBody List<Long> ids, HttpServletResponse response, Principal principal) throws IOException {
+        response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+        response.setHeader(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"selected_evidences.xlsx\"");
+        
+        List<EvidenceDto> selectedEvidences = new java.util.ArrayList<>();
+        for (Long id : ids) {
+            // Re-use access control logic
+            if (accessControlService.canAccessEvidence(principal.getName(), id)) {
+                getEvidenceByIdQueryHandler.handle(id).ifPresent(selectedEvidences::add);
+            }
+        }
+        reportExporter.exportList(selectedEvidences, response.getOutputStream());
     }
 }
