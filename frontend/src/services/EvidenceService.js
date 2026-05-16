@@ -23,6 +23,34 @@ class EvidenceService {
     deleteEvidence(id) {
         return axios.delete(API_URL + '/' + id, { headers: AuthService.getAuthHeader() });
     }
+
+    exportMyReport() {
+        return axios.get('/api/excel/download/my', { 
+            headers: AuthService.getAuthHeader(),
+            responseType: 'blob'
+        });
+    }
+
+    exportAllReports() {
+        return axios.get('/api/excel/download/all', { 
+            headers: AuthService.getAuthHeader(),
+            responseType: 'blob'
+        });
+    }
+
+    exportSingle(id) {
+        return axios.get('/api/excel/download/' + id, { 
+            headers: AuthService.getAuthHeader(),
+            responseType: 'blob'
+        });
+    }
+
+    exportSelected(ids) {
+        return axios.post('/api/excel/download/selected', ids, { 
+            headers: AuthService.getAuthHeader(),
+            responseType: 'blob'
+        });
+    }
 }
 
 export default new EvidenceService();

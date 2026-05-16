@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import UserService from '../services/UserService';
+import EvidenceService from '../services/EvidenceService';
 
 class UserList extends Component {
   constructor(props) {
@@ -13,6 +14,21 @@ class UserList extends Component {
   componentDidMount() {
     this.refreshUsers();
   }
+
+  exportAllReports = () => {
+    EvidenceService.exportAllReports().then(response => {
+      const url = window.URL.createObjectURL(new Blob([response.data]));
+      const link = document.createElement('a');
+      link.href = url;
+      link.setAttribute('download', 'all_users_reports.xlsx');
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+    }).catch(error => {
+      console.error('Download failed', error);
+      alert('Download failed (Admin only)');
+    });
+  };
 
   refreshUsers = () => {
     UserService.getUsers().then(
@@ -39,7 +55,10 @@ class UserList extends Component {
         <div className="glass-card" style={{padding: '30px'}}>
           <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px'}}>
             <h2>Registered Users</h2>
-            <button className="btn-premium" onClick={() => window.location.href='/users/create'}>Invite User</button>
+            <div style={{display: 'flex', gap: '10px'}}>
+                <button className="btn-premium" onClick={this.exportAllReports}>Export All Reports</button>
+                <button className="btn-premium" onClick={() => window.location.href='/users/create'}>Invite User</button>
+            </div>
           </div>
           
           {this.state.message && <div className="alert alert-danger">{this.state.message}</div>}
