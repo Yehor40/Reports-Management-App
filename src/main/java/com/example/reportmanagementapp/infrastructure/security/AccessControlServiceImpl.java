@@ -2,9 +2,9 @@ package com.example.reportmanagementapp.infrastructure.security;
 
 import com.example.reportmanagementapp.application.dto.EvidenceDto;
 import com.example.reportmanagementapp.application.evidence.queries.GetEvidenceByIdQueryHandler;
+import com.example.reportmanagementapp.application.user.queries.FindUserByEmailQueryHandler;
 import com.example.reportmanagementapp.application.user.queries.GetUserIdByUsernameQueryHandler;
 import com.example.reportmanagementapp.domain.entity.User;
-import com.example.reportmanagementapp.domain.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -20,7 +20,7 @@ public class AccessControlServiceImpl implements AccessControlService {
     private GetUserIdByUsernameQueryHandler getUserIdByUsernameQueryHandler;
 
     @Autowired
-    private UserRepository userRepository;
+    private FindUserByEmailQueryHandler findUserByEmailQueryHandler;
 
     @Override
     public boolean canAccessEvidence(String email, Long evidenceId) {
@@ -32,7 +32,7 @@ public class AccessControlServiceImpl implements AccessControlService {
             return false;
         }
 
-        User user = userRepository.findByEmail(email);
+        User user = findUserByEmailQueryHandler.handle(email);
         if (user == null) {
             System.out.println("DEBUG: Access Denied - User not found: " + email);
             return false;
@@ -56,7 +56,7 @@ public class AccessControlServiceImpl implements AccessControlService {
 
     @Override
     public boolean canAccessUser(String email, Long userId) {
-        User user = userRepository.findByEmail(email);
+        User user = findUserByEmailQueryHandler.handle(email);
         if (user == null) return false;
         
         boolean isAdmin = user.getRoles().stream().anyMatch(r -> r.getName().equals("ROLE_ADMIN"));

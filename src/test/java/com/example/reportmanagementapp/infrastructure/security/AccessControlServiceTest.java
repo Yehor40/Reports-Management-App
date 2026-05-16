@@ -2,7 +2,10 @@ package com.example.reportmanagementapp.infrastructure.security;
 
 import com.example.reportmanagementapp.application.dto.EvidenceDto;
 import com.example.reportmanagementapp.application.evidence.queries.GetEvidenceByIdQueryHandler;
+import com.example.reportmanagementapp.application.user.queries.FindUserByEmailQueryHandler;
 import com.example.reportmanagementapp.application.user.queries.GetUserIdByUsernameQueryHandler;
+import com.example.reportmanagementapp.domain.entity.User;
+import com.example.reportmanagementapp.domain.entity.Role;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -22,6 +25,9 @@ class AccessControlServiceTest {
 
     @Mock
     private GetUserIdByUsernameQueryHandler getUserIdByUsernameQueryHandler;
+    
+    @Mock
+    private FindUserByEmailQueryHandler findUserByEmailQueryHandler;
 
     @InjectMocks
     private AccessControlServiceImpl accessControlService;
@@ -35,8 +41,10 @@ class AccessControlServiceTest {
         EvidenceDto dto = new EvidenceDto();
         dto.setUserId(userId);
 
+        User user = User.builder().id(userId).email(email).roles(new java.util.ArrayList<>()).build();
+
         when(getEvidenceByIdQueryHandler.handle(evidenceId)).thenReturn(Optional.of(dto));
-        when(getUserIdByUsernameQueryHandler.handle(email)).thenReturn(userId);
+        when(findUserByEmailQueryHandler.handle(email)).thenReturn(user);
 
         boolean result = accessControlService.canAccessEvidence(email, evidenceId);
 
@@ -53,8 +61,10 @@ class AccessControlServiceTest {
         EvidenceDto dto = new EvidenceDto();
         dto.setUserId(ownerId);
 
+        User user = User.builder().id(otherId).email(email).roles(new java.util.ArrayList<>()).build();
+
         when(getEvidenceByIdQueryHandler.handle(evidenceId)).thenReturn(Optional.of(dto));
-        when(getUserIdByUsernameQueryHandler.handle(email)).thenReturn(otherId);
+        when(findUserByEmailQueryHandler.handle(email)).thenReturn(user);
 
         boolean result = accessControlService.canAccessEvidence(email, evidenceId);
 
@@ -66,9 +76,35 @@ class AccessControlServiceTest {
         String email = "self@example.com";
         Long userId = 10L;
 
-        when(getUserIdByUsernameQueryHandler.handle(email)).thenReturn(userId);
+        User user = User.builder().id(userId).email(email).roles(new java.util.ArrayList<>()).build();
+        when(findUserByEmailQueryHandler.handle(email)).thenReturn(user);
 
         boolean result = accessControlService.canAccessUser(email, userId);
+
+        assertThat(result).isTrue();
+    }
+
+    @Test
+    void canAccessEvidence_WhenUserIsAdmin_ShouldReturnTrue() {
+        String email = "admin@example.com";
+        Long evidenceId = 1L;
+        Long ownerId = 10L;
+
+        EvidenceDto dto = new EvidenceDto();
+        dto.setUserId(ownerId);
+
+        Role adminRole = new Role();
+        adminRole.setName("ROLE_ADMIN");
+        User admin = User.builder()
+                .id(99L)
+                .email(email)
+                .roles(java.util.List.of(adminRole))
+                .build();
+
+        when(getEvidenceByIdQueryHandler.handle(evidenceId)).thenReturn(Optional.of(dto));
+        when(findUserByEmailQueryHandler.handle(email)).thenReturn(admin);
+
+        boolean result = accessControlService.canAccessEvidence(email, evidenceId);
 
         assertThat(result).isTrue();
     }
