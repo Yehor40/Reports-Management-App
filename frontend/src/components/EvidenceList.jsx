@@ -104,7 +104,13 @@ class EvidenceList extends Component {
                 </th>
                 <th style={{padding: '12px', textAlign: 'left'}}>Task Name</th>
                 <th style={{padding: '12px', textAlign: 'left'}}>Project</th>
+                <th style={{padding: '12px', textAlign: 'left'}}>Order Num</th>
+                <th style={{padding: '12px', textAlign: 'left'}}>Department</th>
+                <th style={{padding: '12px', textAlign: 'left'}}>Month</th>
+                <th style={{padding: '12px', textAlign: 'left'}}>Est.Time</th>
                 <th style={{padding: '12px', textAlign: 'left'}}>Spent Time</th>
+                <th style={{padding: '12px', textAlign: 'left'}}>Charge</th>
+                <th style={{padding: '12px', textAlign: 'left'}}>Total</th>
                 <th style={{padding: '12px', textAlign: 'left'}}>State</th>
                 <th style={{padding: '12px', textAlign: 'center'}}>Actions</th>
               </tr>
@@ -121,7 +127,13 @@ class EvidenceList extends Component {
                   </td>
                   <td style={{padding: '12px'}}>{evidence.taskName}</td>
                   <td style={{padding: '12px'}}>{evidence.project}</td>
+                  <td style={{padding: '12px'}}>{evidence.orderNum}</td>
+                  <td style={{padding: '12px'}}>{evidence.department}</td>
+                  <td style={{padding: '12px'}}>{evidence.month}</td>
+                  <td style={{padding: '12px'}}>{evidence.estTime}h</td>
                   <td style={{padding: '12px'}}>{evidence.timeSpent}h</td>
+                  <td style={{padding: '12px'}}>{evidence.charge}CZK</td>
+                  <td style={{padding: '12px'}}>{evidence.total}CZK</td>
                   <td style={{padding: '12px'}}><span style={{background: 'rgba(99,102,241,0.2)', padding: '4px 8px', borderRadius: '4px'}}>{evidence.state}</span></td>
                   <td style={{padding: '12px', textAlign: 'center'}}>
                     <button onClick={() => this.handleDownload(EvidenceService.exportSingle(evidence.id), `report_${evidence.id}.xlsx`)} style={{background: 'none', border: 'none', color: '#6366f1', cursor: 'pointer', marginRight: '10px'}}>Export</button>
