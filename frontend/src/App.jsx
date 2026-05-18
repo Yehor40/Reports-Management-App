@@ -5,6 +5,7 @@ import RegisterPage from './components/RegisterPage';
 import EvidenceList from './components/EvidenceList';
 import EvidenceForm from './components/EvidenceForm';
 import UserList from './components/UserList';
+import Dashboard from './components/Dashboard';
 import AuthService from './services/AuthService';
 
 class App extends Component {
@@ -57,7 +58,7 @@ class App extends Component {
 
           <div className="container mt-3">
             <Routes>
-              <Route path="/" element={<Navigate to="/evidences" />} />
+              <Route path="/" element={<Dashboard />} />
               <Route path="/login" element={<LoginPage />} />
               <Route path="/register" element={<RegisterPage />} />
               <Route path="/evidences" element={<EvidenceList />} />

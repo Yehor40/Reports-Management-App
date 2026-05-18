@@ -22,7 +22,7 @@ class LoginPage extends Component {
 
     AuthService.login(this.state.email, this.state.password).then(
       () => {
-        window.location.href = '/evidences';
+        window.location.href = '/';
       },
       (error) => {
         const resMessage = (error.response && error.response.data && error.response.data.message) || error.message || error.toString();
