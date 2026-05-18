@@ -38,9 +38,12 @@ public class AuthController {
                 .map(org.springframework.security.core.GrantedAuthority::getAuthority)
                 .collect(java.util.stream.Collectors.toList());
 
+        var dbUser = findUserByEmailQueryHandler.handle(request.getEmail());
+
         return ResponseEntity.ok(AuthResponse.builder()
                 .token(jwtToken)
                 .roles(roles)
+                .name(dbUser != null ? dbUser.getName() : null)
                 .build());
     }
 
